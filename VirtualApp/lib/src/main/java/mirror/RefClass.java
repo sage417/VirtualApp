@@ -1,5 +1,7 @@
 package mirror;
 
+import android.util.Log;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -7,7 +9,8 @@ import java.util.HashMap;
 
 public final class RefClass {
 
-    private static HashMap<Class<?>,Constructor<?>> REF_TYPES = new HashMap<Class<?>, Constructor<?>>();
+    private static HashMap<Class<?>, Constructor<?>> REF_TYPES = new HashMap<>();
+
     static {
         try {
             REF_TYPES.put(RefObject.class, RefObject.class.getConstructor(Class.class, Field.class));
@@ -21,9 +24,8 @@ public final class RefClass {
             REF_TYPES.put(RefStaticInt.class, RefStaticInt.class.getConstructor(Class.class, Field.class));
             REF_TYPES.put(RefStaticMethod.class, RefStaticMethod.class.getConstructor(Class.class, Field.class));
             REF_TYPES.put(RefConstructor.class, RefConstructor.class.getConstructor(Class.class, Field.class));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e("mirror", "err init REF_TYPES", e);
         }
     }
 
@@ -31,6 +33,7 @@ public final class RefClass {
         try {
             return load(mappingClass, Class.forName(className));
         } catch (Exception e) {
+            Log.e("mirror", "err load clazz:" + className, e);
             return null;
         }
     }
@@ -46,9 +49,9 @@ public final class RefClass {
                         field.set(null, constructor.newInstance(realClass, field));
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // Ignore
+                Log.e("mirror", "err load field:" + field.getName(), e);
             }
         }
         return realClass;

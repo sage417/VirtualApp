@@ -30,7 +30,7 @@ public final class AppInstrumentation extends InstrumentationDelegate implements
 
     private static final String TAG = AppInstrumentation.class.getSimpleName();
 
-    private static AppInstrumentation gDefault;
+    private static volatile AppInstrumentation gDefault;
 
     private AppInstrumentation(Instrumentation base) {
         super(base);

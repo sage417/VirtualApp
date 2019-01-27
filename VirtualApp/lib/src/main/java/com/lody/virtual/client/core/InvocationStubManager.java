@@ -63,6 +63,7 @@ import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.LOLLIPOP_MR1;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.N;
+import static android.os.Build.VERSION_CODES.O;
 
 /**
  * @author Lody
@@ -71,7 +72,7 @@ import static android.os.Build.VERSION_CODES.N;
 public final class InvocationStubManager {
 
     private static InvocationStubManager sInstance = new InvocationStubManager();
-    private static boolean sInit;
+    private static volatile boolean sInit;
 
 	private Map<Class<?>, IInjector> mInjectors = new HashMap<>(13);
 
@@ -98,16 +99,15 @@ public final class InvocationStubManager {
 	}
 
 
-	public void init() throws Throwable {
+	public void init() {
 		if (isInit()) {
-			throw new IllegalStateException("InvocationStubManager Has been initialized.");
+			throw new IllegalStateException("InvocationStubManager has been initialized.");
 		}
 		injectInternal();
 		sInit = true;
-
 	}
 
-	private void injectInternal() throws Throwable {
+	private void injectInternal() {
 		if (VirtualCore.get().isMainProcess()) {
 			return;
 		}
@@ -180,7 +180,7 @@ public final class InvocationStubManager {
                 addInjector(new ShortcutServiceStub());
                 addInjector(new DevicePolicyManagerStub());
             }
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= O) {
 				addInjector(new AutoFillManagerStub());
 			}
 		}
@@ -208,7 +208,7 @@ public final class InvocationStubManager {
 
 	public <T extends IInjector, H extends MethodInvocationStub> H getInvocationStub(Class<T> injectorClass) {
 		T injector = findInjector(injectorClass);
-		if (injector != null && injector instanceof MethodInvocationProxy) {
+		if (injector instanceof MethodInvocationProxy) {
 			// noinspection unchecked
 			return (H) ((MethodInvocationProxy) injector).getInvocationStub();
 		}
