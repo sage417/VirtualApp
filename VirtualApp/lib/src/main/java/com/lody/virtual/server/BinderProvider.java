@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.stub.DaemonService;
@@ -44,8 +45,6 @@ import mirror.android.app.job.IJobScheduler;
  */
 public final class BinderProvider extends ContentProvider {
 
-    private final ServiceFetcher mServiceFetcher = new ServiceFetcher();
-
     @Override
     public boolean onCreate() {
         Context context = getContext();
@@ -76,7 +75,7 @@ public final class BinderProvider extends ContentProvider {
     }
 
     @Override
-    public Bundle call(String method, String arg, Bundle extras) {
+    public Bundle call(@NonNull String method, String arg, Bundle extras) {
         if ("@".equals(method)) {
             Bundle bundle = new Bundle();
             BundleCompat.putBinder(bundle, "_VA_|_binder_", mServiceFetcher);
@@ -113,27 +112,20 @@ public final class BinderProvider extends ContentProvider {
         return 0;
     }
 
-    private class ServiceFetcher extends IServiceFetcher.Stub {
+    private final IServiceFetcher.Stub mServiceFetcher = new IServiceFetcher.Stub() {
         @Override
-        public IBinder getService(String name) throws RemoteException {
-            if (name != null) {
-                return ServiceCache.getService(name);
-            }
-            return null;
+        public IBinder getService(@NonNull String name) {
+            return ServiceCache.getService(name);
         }
 
         @Override
-        public void addService(String name, IBinder service) throws RemoteException {
-            if (name != null && service != null) {
-                ServiceCache.addService(name, service);
-            }
+        public void addService(@NonNull String name, @NonNull IBinder service) {
+            ServiceCache.addService(name, service);
         }
 
         @Override
-        public void removeService(String name) throws RemoteException {
-            if (name != null) {
-                ServiceCache.removeService(name);
-            }
+        public void removeService(@NonNull String name) {
+            ServiceCache.removeService(name);
         }
-    }
+    };
 }
