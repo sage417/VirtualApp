@@ -220,6 +220,7 @@ public class MethodInvocationStub<T> {
         }
     }
 
+    @Deprecated
     private void dumpMethodProxies() {
         StringBuilder sb = new StringBuilder(50);
         sb.append("*********************");

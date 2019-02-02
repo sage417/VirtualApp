@@ -45,7 +45,7 @@ public class ActivityManagerStub extends MethodInvocationProxy<MethodInvocationS
     }
 
     @Override
-    public void inject() throws Throwable {
+    public void inject() {
         if (BuildCompat.isOreo()) {
             //Android Oreo(8.X)
             Object singleton = ActivityManagerOreo.IActivityManagerSingleton.get();

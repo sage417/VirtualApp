@@ -12,20 +12,49 @@ import mirror.android.os.BundleICS;
  * @author Lody
  */
 public class BundleCompat {
+
+    private static IBundleCompat BC;
+
+    static {
+        BC = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 ?
+                new IBundleCompat() {
+                    @Override
+                    public IBinder getBinder(Bundle bundle, String key) {
+                        return bundle.getBinder(key);
+                    }
+
+                    @Override
+                    public void putBinder(Bundle bundle, String key, IBinder value) {
+                        bundle.putBinder(key, value);
+                    }
+                } :
+                new IBundleCompat() {
+                    @Override
+                    public IBinder getBinder(Bundle bundle, String key) {
+                        return mirror.android.os.Bundle.getIBinder.call(bundle, key);
+                    }
+
+                    @Override
+                    public void putBinder(Bundle bundle, String key, IBinder value) {
+                        mirror.android.os.Bundle.putIBinder.call(bundle, key, value);
+                    }
+                };
+    }
+
+    interface IBundleCompat {
+        IBinder getBinder(Bundle bundle, String key);
+        void putBinder(Bundle bundle, String key, IBinder value);
+    }
+
+    private BundleCompat() {
+    }
+
     public static IBinder getBinder(Bundle bundle, String key) {
-        if (Build.VERSION.SDK_INT >= 18) {
-            return bundle.getBinder(key);
-        } else {
-            return mirror.android.os.Bundle.getIBinder.call(bundle, key);
-        }
+        return BC.getBinder(bundle, key);
     }
 
     public static void putBinder(Bundle bundle, String key, IBinder value) {
-        if (Build.VERSION.SDK_INT >= 18) {
-            bundle.putBinder(key, value);
-        } else {
-            mirror.android.os.Bundle.putIBinder.call(bundle, key, value);
-        }
+        BC.putBinder(bundle, key, value);
     }
 
     public static void clearParcelledData(Bundle bundle) {
