@@ -1,8 +1,9 @@
 package mirror.android.app;
 
 
-import android.app.*;
 import android.app.Activity;
+import android.app.Application;
+import android.app.Instrumentation;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,18 +17,21 @@ import android.os.IBinder;
 import android.os.IInterface;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import mirror.RefClass;
-import mirror.RefConstructor;
-import mirror.RefObject;
-import mirror.RefMethod;
 import mirror.MethodParams;
 import mirror.MethodReflectParams;
-import mirror.RefStaticObject;
+import mirror.MethodSuggestParam;
+import mirror.MethodSuggestParams;
+import mirror.RefClass;
+import mirror.RefConstructor;
+import mirror.RefMethod;
+import mirror.RefObject;
 import mirror.RefStaticInt;
 import mirror.RefStaticMethod;
+import mirror.RefStaticObject;
 
 public class ActivityThread {
     public static Class<?> TYPE = RefClass.load(ActivityThread.class, "android.app.ActivityThread");
@@ -41,18 +45,57 @@ public class ActivityThread {
     public static RefObject<Instrumentation> mInstrumentation;
     public static RefObject<Map<String, WeakReference<?>>> mPackages;
     public static RefObject<Map> mProviderMap;
-    @MethodParams({IBinder.class, List.class})
+    @MethodSuggestParams({@MethodSuggestParam({IBinder.class, List.class}), @MethodSuggestParam({IBinder.class, List.class, boolean.class})})
     public static RefMethod<Void> performNewIntents;
     public static RefStaticObject<IInterface> sPackageManager;
     @MethodParams({IBinder.class, String.class, int.class, int.class, Intent.class})
     public static RefMethod<Void> sendActivityResult;
     public static RefMethod<Binder> getApplicationThread;
 
+    public static PerformNewIntentsAdaptor performNewIntentsAdaptor;
+
+    static {
+        performNewIntentsAdaptor = PerformNewIntentsAdaptor.choose();
+    }
+
+    public static void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+        performNewIntentsAdaptor.performNewIntents(thread, iBinder, intent);
+    }
+
     public static Object installProvider(Object mainThread, Context context, ProviderInfo providerInfo, Object holder) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
             return installProvider.call(mainThread, context, holder, providerInfo, false, true);
         }
         return installProvider.call(mainThread, context, holder, providerInfo, false, true, true);
+    }
+
+    private static abstract class PerformNewIntentsAdaptor {
+
+        abstract void performNewIntents(Object thread, IBinder iBinder, Intent intent);
+
+        static PerformNewIntentsAdaptor choose() {
+            switch (performNewIntents.paramList().length) {
+                case 3:
+                    return new NMR1PerformNewIntentsAdaptor();
+                case 2:
+                default:
+                    return new DefaultPerformNewIntentsAdaptor();
+            }
+        }
+
+        static class DefaultPerformNewIntentsAdaptor extends PerformNewIntentsAdaptor {
+            @Override
+            void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+                performNewIntents.call(thread, iBinder, Collections.singletonList(intent));
+            }
+        }
+
+        static class NMR1PerformNewIntentsAdaptor extends PerformNewIntentsAdaptor {
+            @Override
+            void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+                performNewIntents.call(thread, iBinder, Collections.singletonList(intent), true);
+            }
+        }
     }
 
     public static class ActivityClientRecord {
