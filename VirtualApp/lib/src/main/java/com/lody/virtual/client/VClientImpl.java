@@ -21,7 +21,6 @@ import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Parcelable;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.StrictMode;
@@ -60,7 +59,6 @@ import java.util.List;
 import java.util.Map;
 
 import mirror.android.app.ActivityThread;
-import mirror.android.app.ActivityThreadNMR1;
 import mirror.android.app.ContextImpl;
 import mirror.android.app.ContextImplKitkat;
 import mirror.android.app.IActivityManager;
@@ -186,19 +184,7 @@ public final class VClientImpl extends IVClient.Stub {
         } else {
             intent = data.intent;
         }
-        if (ActivityThread.performNewIntents != null) {
-            ActivityThread.performNewIntents.call(
-                    VirtualCore.mainThread(),
-                    data.token,
-                    Collections.singletonList(intent)
-            );
-        } else {
-            ActivityThreadNMR1.performNewIntents.call(
-                    VirtualCore.mainThread(),
-                    data.token,
-                    Collections.singletonList(intent),
-                    true);
-        }
+        ActivityThread.performNewIntents(VirtualCore.mainThread(), data.token, intent);
     }
 
     public void bindApplication(final String packageName, final String processName) {

@@ -43,8 +43,16 @@ public class RefMethod<T> {
             }
             this.method = cls.getDeclaredMethod(field.getName(), types);
             this.method.setAccessible(true);
-        }
-        else {
+        } else if (field.isAnnotationPresent(MethodSuggestParams.class)) {
+            for (MethodSuggestParam param : field.getAnnotation(MethodSuggestParams.class).value()) {
+                try {
+                    method = cls.getDeclaredMethod(field.getName(), param.value());
+                    break;
+                } catch (NoSuchMethodException ignore) {
+
+                }
+            }
+        } else {
             for (Method method : cls.getDeclaredMethods()) {
                 if (method.getName().equals(field.getName())) {
                     this.method = method;
