@@ -9,6 +9,7 @@ import com.lody.virtual.helper.collection.SparseArray;
 import com.lody.virtual.os.VEnvironment;
 import com.lody.virtual.remote.vloc.VCell;
 import com.lody.virtual.remote.vloc.VLocation;
+import com.lody.virtual.remote.vloc.VWifi;
 import com.lody.virtual.server.interfaces.IVirtualLocationManager;
 
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class VirtualLocationService implements IVirtualLocationManager {
         VCell cell;
         List<VCell> allCell;
         List<VCell> neighboringCell;
+        List<VWifi> allWIfi;
         VLocation location;
 
         public void set(VLocConfig other) {
@@ -42,6 +44,7 @@ public class VirtualLocationService implements IVirtualLocationManager {
             this.allCell = other.allCell;
             this.neighboringCell = other.neighboringCell;
             this.location = other.location;
+            this.allWIfi = other.allWIfi;
         }
 
         VLocConfig() {
@@ -58,6 +61,7 @@ public class VirtualLocationService implements IVirtualLocationManager {
             dest.writeParcelable(this.cell, flags);
             dest.writeTypedList(this.allCell);
             dest.writeTypedList(this.neighboringCell);
+            dest.writeTypedList(this.allWIfi);
             dest.writeParcelable(this.location, flags);
         }
 
@@ -66,6 +70,7 @@ public class VirtualLocationService implements IVirtualLocationManager {
             this.cell = in.readParcelable(VCell.class.getClassLoader());
             this.allCell = in.createTypedArrayList(VCell.CREATOR);
             this.neighboringCell = in.createTypedArrayList(VCell.CREATOR);
+            this.allWIfi = in.createTypedArrayList(VWifi.CREATOR);
             this.location = in.readParcelable(VLocation.class.getClassLoader());
         }
 
@@ -266,4 +271,21 @@ public class VirtualLocationService implements IVirtualLocationManager {
         return mGlobalConfig.location;
     }
 
+    @Override
+    public void setAllWifi(int userId, String pkg, List<VWifi> wifi) throws RemoteException {
+        getOrCreateConfig(userId, pkg).allWIfi = wifi;
+    }
+    @Override
+    public List<VWifi> getAllWifi(int userId, String pkg) throws RemoteException {
+        VLocConfig config = getOrCreateConfig(userId, pkg);
+        mPersistenceLayer.save();
+        switch (config.mode) {
+            case MODE_USE_SELF:
+            case MODE_USE_GLOBAL:
+                return config.allWIfi;
+            case MODE_CLOSE:
+            default:
+                return null;
+        }
+    }
 }

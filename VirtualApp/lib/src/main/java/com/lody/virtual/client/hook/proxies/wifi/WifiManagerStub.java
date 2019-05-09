@@ -160,10 +160,30 @@ public class WifiManagerStub extends BinderInvocationProxy {
         public Object call(Object who, Method method, Object... args) throws Throwable {
 //            noinspection unchecked
             if (isFakeLocationEnable()) {
-                new ArrayList<ScanResult>(0);
+                List<VWifi> wifiList = VirtualLocationManager.get().getAllWifi();
+                List<ScanResult> result = new ArrayList<>();
+                try {
+                    Class<?> scanResultClass = Class.forName("android.net.wifi.ScanResult");
+                    for (int i = 0; i < wifiList.size(); i++) {
+                        ScanResult instance = (ScanResult) scanResultClass.newInstance();
+                        copy2ScanResult(instance,wifiList.get(i));
+                        result.add(instance);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return result;
             }
             return super.call(who, method, args);
         }
+    }
+    public void copy2ScanResult(ScanResult scanResult, VWifi vWifi){
+        scanResult.SSID = vWifi.ssid;
+        scanResult.BSSID = vWifi.bssid;
+        scanResult.capabilities = vWifi.capabilities;
+        scanResult.level = vWifi.level;
+        scanResult.frequency = vWifi.frequency;
+        scanResult.timestamp = vWifi.timestamp;
     }
 
     private static ScanResult cloneScanResult(Parcelable scanResult) {
