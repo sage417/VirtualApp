@@ -4,6 +4,7 @@ import android.os.RemoteException;
 
 import com.lody.virtual.remote.vloc.VCell;
 import com.lody.virtual.remote.vloc.VLocation;
+import com.lody.virtual.remote.vloc.VWifi;
 
 import java.util.List;
 
@@ -41,4 +42,8 @@ public interface IVirtualLocationManager {
     void setGlobalLocation(VLocation loc) throws RemoteException;
 
     VLocation getGlobalLocation() throws RemoteException;
+
+    void setAllWifi(int userId, String pkg, List<VWifi> wifi) throws RemoteException;
+
+    List<VWifi> getAllWifi(int userId, String pkg) throws RemoteException;
 }

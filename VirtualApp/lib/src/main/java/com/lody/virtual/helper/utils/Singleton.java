@@ -8,7 +8,7 @@ package com.lody.virtual.helper.utils;
  * @hide
  */
 public abstract class Singleton<T> {
-    private T mInstance;
+    private volatile T mInstance;
 
     protected abstract T create();
 

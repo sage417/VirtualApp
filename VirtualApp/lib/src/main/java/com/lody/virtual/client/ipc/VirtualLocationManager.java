@@ -7,6 +7,7 @@ import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.helper.ipcbus.IPCSingleton;
 import com.lody.virtual.remote.vloc.VCell;
 import com.lody.virtual.remote.vloc.VLocation;
+import com.lody.virtual.remote.vloc.VWifi;
 import com.lody.virtual.server.interfaces.IVirtualLocationManager;
 
 import java.util.List;
@@ -95,6 +96,20 @@ public class VirtualLocationManager {
         }
     }
 
+    public void setAllWifi(int userId, String pkg, List<VWifi> wifi) {
+        try {
+            getService().setAllWifi(userId, pkg, wifi);
+        } catch (RemoteException e) {
+            VirtualRuntime.crash(e);
+        }
+    }
+    public List<VWifi> getAllWifi(int userId, String pkg) {
+        try {
+            return getService().getAllWifi(userId, pkg);
+        } catch (RemoteException e) {
+            return VirtualRuntime.crash(e);
+        }
+    }
     public List<VCell> getNeighboringCell(int userId, String pkg) {
         try {
             return getService().getNeighboringCell(userId, pkg);
@@ -148,6 +163,9 @@ public class VirtualLocationManager {
         return getLocation(MethodProxy.getAppUserId(), MethodProxy.getAppPkg());
     }
 
+    public List<VWifi> getAllWifi() {
+        return getAllWifi(MethodProxy.getAppUserId(), MethodProxy.getAppPkg());
+    }
     public void setGlobalLocation(VLocation loc) {
         try {
             getService().setGlobalLocation(loc);
