@@ -27,7 +27,6 @@ import io.virtualapp.home.adapters.AppPagerAdapter;
 public class ListAppActivity extends VActivity {
 
     private Toolbar mToolBar;
-    private TabLayout mTabLayout;
     private ViewPager mViewPager;
 
     public static void gotoListApp(Activity activity) {
@@ -40,9 +39,9 @@ public class ListAppActivity extends VActivity {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimaryDark)));
         setContentView(R.layout.activity_clone_app);
-        mToolBar = (Toolbar) findViewById(R.id.clone_app_tool_bar);
-        mTabLayout = (TabLayout) mToolBar.findViewById(R.id.clone_app_tab_layout);
-        mViewPager = (ViewPager) findViewById(R.id.clone_app_view_pager);
+        mToolBar = findViewById(R.id.clone_app_tool_bar);
+        TabLayout mTabLayout = mToolBar.findViewById(R.id.clone_app_tab_layout);
+        mViewPager = findViewById(R.id.clone_app_view_pager);
         setupToolBar();
         mViewPager.setAdapter(new AppPagerAdapter(getSupportFragmentManager()));
         mTabLayout.setupWithViewPager(mViewPager);

@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -26,10 +27,10 @@ import android.widget.Toast;
 
 import com.lody.virtual.GmsSupport;
 import com.lody.virtual.client.stub.ChooseTypeAndAccountActivity;
+import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VUserInfo;
 import com.lody.virtual.os.VUserManager;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,14 +141,12 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         mMenuView.setOnClickListener(v -> mPopupMenu.show());
     }
 
+    @SuppressLint("RestrictedApi")
     private static void setIconEnable(Menu menu, boolean enable) {
-        try {
-            @SuppressLint("PrivateApi")
-            Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", boolean.class);
-            m.setAccessible(true);
-            m.invoke(menu, enable);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (menu instanceof MenuBuilder) {
+            ((MenuBuilder) menu).setOptionalIconsVisible(enable);
+        } else {
+            VLog.w("APP", "menu is not instance of MenuBuilder, actual type: %s", menu.getClass().getName());
         }
     }
 
@@ -409,13 +408,10 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
             if (upAtCreateShortcutArea || upAtDeleteAppArea) {
                 return false;
             }
-            try {
-                AppData data = mLaunchpadAdapter.getList().get(target.getAdapterPosition());
-                return data.canReorder();
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
+            if (target.getAdapterPosition() >= mLaunchpadAdapter.getList().size()) {
+                return false;
             }
-            return false;
+            return mLaunchpadAdapter.getList().get(target.getAdapterPosition()).canReorder();
         }
 
         @Override
