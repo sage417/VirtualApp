@@ -8,5 +8,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MethodSuggestParam {
-    Class<?>[] value();
+
+    Class<?>[] value() default {};
+
+    String[] classNames() default {};
 }
