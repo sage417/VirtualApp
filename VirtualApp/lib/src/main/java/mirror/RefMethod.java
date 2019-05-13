@@ -1,5 +1,7 @@
 package mirror;
 
+import com.lody.virtual.helper.utils.Reflect;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -45,12 +47,21 @@ public class RefMethod<T> {
             this.method.setAccessible(true);
         } else if (field.isAnnotationPresent(MethodSuggestParams.class)) {
             for (MethodSuggestParam param : field.getAnnotation(MethodSuggestParams.class).value()) {
-                try {
-                    method = cls.getDeclaredMethod(field.getName(), param.value());
-                    break;
-                } catch (NoSuchMethodException ignore) {
-
+                Class<?>[] paramTypes = new Class[0];
+                if (param.value().length > 0) {
+                    paramTypes = new Class[param.value().length];
+                    System.arraycopy(param.value(), 0, paramTypes, 0, param.value().length);
+                } else if (param.classNames().length > 0) {
+                    paramTypes = new Class[param.classNames().length];
+                    for (int i = 0; i < param.classNames().length; i++) {
+                        paramTypes[i] = Reflect.onClass(param.classNames()[i]).get();
+                    }
                 }
+
+                try {
+                    method = cls.getDeclaredMethod(field.getName(), paramTypes);
+                    break;
+                } catch (NoSuchMethodException ignore) { }
             }
         } else {
             for (Method method : cls.getDeclaredMethods()) {
