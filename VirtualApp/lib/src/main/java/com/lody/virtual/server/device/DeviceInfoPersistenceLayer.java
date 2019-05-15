@@ -1,9 +1,9 @@
 package com.lody.virtual.server.device;
 
 import android.os.Parcel;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.lody.virtual.helper.PersistenceLayer;
-import com.lody.virtual.helper.collection.SparseArray;
 import com.lody.virtual.os.VEnvironment;
 import com.lody.virtual.remote.VDeviceInfo;
 
@@ -37,7 +37,7 @@ public class DeviceInfoPersistenceLayer extends PersistenceLayer {
 
     @Override
     public void writePersistenceData(Parcel p) {
-        SparseArray<VDeviceInfo> infos = mService.getDeviceInfos();
+        SparseArrayCompat<VDeviceInfo> infos = mService.getDeviceInfos();
         int size = infos.size();
         p.writeInt(size);
         for (int i = 0; i < size; i++) {
@@ -50,7 +50,7 @@ public class DeviceInfoPersistenceLayer extends PersistenceLayer {
 
     @Override
     public void readPersistenceData(Parcel p) {
-        SparseArray<VDeviceInfo> infos = mService.getDeviceInfos();
+        SparseArrayCompat<VDeviceInfo> infos = mService.getDeviceInfos();
         infos.clear();
         int size = p.readInt();
         while (size-- > 0) {

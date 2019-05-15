@@ -17,7 +17,7 @@ import android.util.Log;
 import com.lody.virtual.client.core.InvocationStubManager;
 import com.lody.virtual.client.hook.proxies.am.ActivityManagerStub;
 import com.lody.virtual.helper.utils.VLog;
-import com.lody.virtual.helper.collection.SparseArray;
+import android.support.v4.util.SparseArrayCompat;
 import com.lody.virtual.os.VUserHandle;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ import static com.lody.virtual.server.job.VJobSchedulerService.get;
 public class StubJob extends Service {
 
     private static final String TAG = StubJob.class.getSimpleName();
-    private final SparseArray<JobSession> mJobSessions = new SparseArray<>();
+    private final SparseArrayCompat<JobSession> mJobSessions = new SparseArrayCompat<>();
     private JobScheduler mScheduler;
     private final IJobService mService = new IJobService.Stub() {
 

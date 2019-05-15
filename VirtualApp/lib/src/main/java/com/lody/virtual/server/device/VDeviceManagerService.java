@@ -2,9 +2,8 @@ package com.lody.virtual.server.device;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.os.RemoteException;
+import android.support.v4.util.SparseArrayCompat;
 
-import com.lody.virtual.helper.collection.SparseArray;
 import com.lody.virtual.remote.VDeviceInfo;
 import com.lody.virtual.server.interfaces.IDeviceInfoManager;
 
@@ -20,7 +19,7 @@ import java.util.Random;
 public class VDeviceManagerService implements IDeviceInfoManager {
 
     private static VDeviceManagerService sInstance = new VDeviceManagerService();
-    private final SparseArray<VDeviceInfo> mDeviceInfos = new SparseArray<>();
+    private final SparseArrayCompat<VDeviceInfo> mDeviceInfos = new SparseArrayCompat<>();
     private DeviceInfoPersistenceLayer mPersistenceLayer = new DeviceInfoPersistenceLayer(this);
     private UsedDeviceInfoPool mPool = new UsedDeviceInfoPool();
 
@@ -108,7 +107,7 @@ public class VDeviceManagerService implements IDeviceInfoManager {
     }
 
 
-    SparseArray<VDeviceInfo> getDeviceInfos() {
+    SparseArrayCompat<VDeviceInfo> getDeviceInfos() {
         return mDeviceInfos;
     }
 

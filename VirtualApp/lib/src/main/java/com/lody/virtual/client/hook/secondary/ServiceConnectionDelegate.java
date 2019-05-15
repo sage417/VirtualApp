@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.lody.virtual.client.VClientImpl;
 import com.lody.virtual.client.core.VirtualCore;
-import com.lody.virtual.helper.collection.ArrayMap;
+import android.support.v4.util.ArrayMap;
 import com.lody.virtual.server.IBinderDelegateService;
 
 import mirror.android.app.ActivityThread;

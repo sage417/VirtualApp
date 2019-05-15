@@ -3,9 +3,9 @@ package com.lody.virtual.server.location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
+import android.support.v4.util.SparseArrayCompat;
 
 import com.lody.virtual.helper.PersistenceLayer;
-import com.lody.virtual.helper.collection.SparseArray;
 import com.lody.virtual.os.VEnvironment;
 import com.lody.virtual.remote.vloc.VCell;
 import com.lody.virtual.remote.vloc.VLocation;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class VirtualLocationService implements IVirtualLocationManager {
 
     private static final VirtualLocationService sInstance = new VirtualLocationService();
-    private final SparseArray<Map<String, VLocConfig>> mLocConfigs = new SparseArray<>();
+    private final SparseArrayCompat<Map<String, VLocConfig>> mLocConfigs = new SparseArrayCompat<>();
     private final VLocConfig mGlobalConfig = new VLocConfig();
 
     private static final int MODE_CLOSE = 0;
