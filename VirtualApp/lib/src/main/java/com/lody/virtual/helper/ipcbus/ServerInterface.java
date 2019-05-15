@@ -1,8 +1,8 @@
 package com.lody.virtual.helper.ipcbus;
 
 import android.os.Binder;
+import android.support.v4.util.SparseArrayCompat;
 
-import com.lody.virtual.helper.collection.SparseArray;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -14,13 +14,13 @@ import java.util.Map;
 public class ServerInterface {
 
     private Class<?> interfaceClass;
-    private final SparseArray<IPCMethod> codeToInterfaceMethod;
+    private final SparseArrayCompat<IPCMethod> codeToInterfaceMethod;
     private final Map<Method, IPCMethod> methodToIPCMethodMap;
 
     public ServerInterface(Class<?> interfaceClass) {
         this.interfaceClass = interfaceClass;
         Method[] methods = interfaceClass.getMethods();
-        codeToInterfaceMethod = new SparseArray<>(methods.length);
+        codeToInterfaceMethod = new SparseArrayCompat<>(methods.length);
         methodToIPCMethodMap = new HashMap<>(methods.length);
         for (int i = 0; i < methods.length; i++) {
             int code = Binder.FIRST_CALL_TRANSACTION + i;

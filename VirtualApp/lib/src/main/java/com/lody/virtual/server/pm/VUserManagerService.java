@@ -16,7 +16,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.env.Constants;
 import com.lody.virtual.helper.compat.ActivityManagerCompat;
 import com.lody.virtual.helper.utils.ArrayUtils;
-import com.lody.virtual.helper.utils.AtomicFile;
+import android.support.v4.util.AtomicFile;
 import com.lody.virtual.helper.utils.FastXmlSerializer;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.os.VBinder;

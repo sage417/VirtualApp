@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.IInterface;
-import android.os.Parcel;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -34,15 +33,15 @@ import com.lody.virtual.client.env.SpecialComponentList;
 import com.lody.virtual.client.ipc.ProviderCall;
 import com.lody.virtual.client.ipc.VNotificationManager;
 import com.lody.virtual.client.stub.VASettings;
-import com.lody.virtual.helper.collection.ArrayMap;
-import com.lody.virtual.helper.collection.SparseArray;
+import android.support.v4.util.ArrayMap;
+import android.support.v4.util.SparseArrayCompat;
+
 import com.lody.virtual.helper.compat.ActivityManagerCompat;
 import com.lody.virtual.helper.compat.ApplicationThreadCompat;
 import com.lody.virtual.helper.compat.BundleCompat;
 import com.lody.virtual.helper.compat.IApplicationThreadCompat;
 import com.lody.virtual.helper.utils.ComponentUtils;
 import com.lody.virtual.helper.utils.VLog;
-import com.lody.virtual.os.VBinder;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.AppTaskInfo;
 import com.lody.virtual.remote.BadgerInfo;
@@ -50,7 +49,6 @@ import com.lody.virtual.remote.PendingIntentData;
 import com.lody.virtual.remote.PendingResultData;
 import com.lody.virtual.remote.VParceledListSlice;
 import com.lody.virtual.server.interfaces.IActivityManager;
-import com.lody.virtual.server.interfaces.IProcessObserver;
 import com.lody.virtual.server.pm.PackageCacheManager;
 import com.lody.virtual.server.pm.PackageSetting;
 import com.lody.virtual.server.pm.VAppManagerService;
@@ -80,7 +78,7 @@ public class VActivityManagerService implements IActivityManager {
 
     private static final AtomicReference<VActivityManagerService> sService = new AtomicReference<>();
     private static final String TAG = VActivityManagerService.class.getSimpleName();
-    private final SparseArray<ProcessRecord> mPidsSelfLocked = new SparseArray<ProcessRecord>();
+    private final SparseArrayCompat<ProcessRecord> mPidsSelfLocked = new SparseArrayCompat<ProcessRecord>();
     private final ActivityStack mMainStack = new ActivityStack(this);
     private final Set<ServiceRecord> mHistory = new HashSet<ServiceRecord>();
     private final ProcessMap<ProcessRecord> mProcessNames = new ProcessMap<ProcessRecord>();
@@ -881,10 +879,10 @@ public class VActivityManagerService implements IActivityManager {
     @Override
     public void killAppByPkg(final String pkg, int userId) {
         synchronized (mProcessNames) {
-            ArrayMap<String, SparseArray<ProcessRecord>> map = mProcessNames.getMap();
+            ArrayMap<String, SparseArrayCompat<ProcessRecord>> map = mProcessNames.getMap();
             int N = map.size();
             while (N-- > 0) {
-                SparseArray<ProcessRecord> uids = map.valueAt(N);
+                SparseArrayCompat<ProcessRecord> uids = map.valueAt(N);
                 for (int i = 0; i < uids.size(); i++) {
                     ProcessRecord r = uids.valueAt(i);
                     if (userId != VUserHandle.USER_ALL) {

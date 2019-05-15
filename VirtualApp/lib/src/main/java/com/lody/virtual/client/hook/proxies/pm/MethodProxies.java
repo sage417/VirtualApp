@@ -27,7 +27,7 @@ import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.hook.base.MethodProxy;
 import com.lody.virtual.client.hook.utils.MethodParameterUtils;
 import com.lody.virtual.client.ipc.VPackageManager;
-import com.lody.virtual.helper.collection.ArraySet;
+import android.support.v4.util.ArraySet;
 import com.lody.virtual.helper.compat.ParceledListSliceCompat;
 import com.lody.virtual.helper.utils.ArrayUtils;
 import com.lody.virtual.os.VUserHandle;
