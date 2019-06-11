@@ -3,7 +3,7 @@ package com.lody.virtual.server.location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.SparseArrayCompat;
 
 import com.lody.virtual.helper.PersistenceLayer;
 import com.lody.virtual.os.VEnvironment;

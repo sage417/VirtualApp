@@ -1,7 +1,7 @@
 package com.lody.virtual.server.device;
 
 import android.os.Parcel;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.SparseArrayCompat;
 
 import com.lody.virtual.helper.PersistenceLayer;
 import com.lody.virtual.os.VEnvironment;

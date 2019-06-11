@@ -1,6 +1,6 @@
 package com.lody.virtual.server.pm;
 
-import android.support.v4.util.ArrayMap;
+import androidx.collection.ArrayMap;
 import com.lody.virtual.server.pm.parser.PackageParserEx;
 import com.lody.virtual.server.pm.parser.VPackage;
 

@@ -33,8 +33,8 @@ import com.lody.virtual.client.env.SpecialComponentList;
 import com.lody.virtual.client.ipc.ProviderCall;
 import com.lody.virtual.client.ipc.VNotificationManager;
 import com.lody.virtual.client.stub.VASettings;
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.ArrayMap;
+import androidx.collection.SparseArrayCompat;
 
 import com.lody.virtual.helper.compat.ActivityManagerCompat;
 import com.lody.virtual.helper.compat.ApplicationThreadCompat;

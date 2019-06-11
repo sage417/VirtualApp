@@ -17,7 +17,7 @@ import android.util.Log;
 import com.lody.virtual.client.core.InvocationStubManager;
 import com.lody.virtual.client.hook.proxies.am.ActivityManagerStub;
 import com.lody.virtual.helper.utils.VLog;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.SparseArrayCompat;
 import com.lody.virtual.os.VUserHandle;
 
 import java.util.Map;

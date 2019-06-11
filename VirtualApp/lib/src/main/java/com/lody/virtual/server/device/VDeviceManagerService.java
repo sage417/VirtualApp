@@ -2,7 +2,7 @@ package com.lody.virtual.server.device;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.SparseArrayCompat;
 
 import com.lody.virtual.remote.VDeviceInfo;
 import com.lody.virtual.server.interfaces.IDeviceInfoManager;

@@ -1,7 +1,7 @@
 package com.lody.virtual.server.am;
 
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.SparseArrayCompat;
+import androidx.collection.ArrayMap;
+import androidx.collection.SparseArrayCompat;
 
 class ProcessMap<E> {
 	private final ArrayMap<String, SparseArrayCompat<E>> mMap = new ArrayMap<>();

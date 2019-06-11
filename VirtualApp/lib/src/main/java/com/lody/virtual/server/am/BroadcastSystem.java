@@ -1,6 +1,5 @@
 package com.lody.virtual.server.am;
 
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +14,7 @@ import android.os.Message;
 
 import com.lody.virtual.client.core.VirtualCore;
 import com.lody.virtual.client.env.SpecialComponentList;
-import android.support.v4.util.ArrayMap;
+import androidx.collection.ArrayMap;
 import com.lody.virtual.helper.utils.Reflect;
 import com.lody.virtual.helper.utils.VLog;
 import com.lody.virtual.remote.PendingResultData;
@@ -23,7 +22,6 @@ import com.lody.virtual.server.pm.PackageSetting;
 import com.lody.virtual.server.pm.VAppManagerService;
 import com.lody.virtual.server.pm.parser.VPackage;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
