@@ -1,6 +1,7 @@
 package com.lody.virtual.client.core;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,15 +12,23 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ConditionVariable;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.os.RemoteException;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 
 import com.lody.virtual.R;
 import com.lody.virtual.client.VClientImpl;
@@ -48,6 +57,8 @@ import com.lody.virtual.server.interfaces.IPackageObserver;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import dalvik.system.DexFile;
@@ -442,7 +453,7 @@ public final class VirtualCore {
         if (targetIntent == null) {
             return false;
         }
-        Intent shortcutIntent = new Intent();
+        Intent shortcutIntent = new Intent(Intent.ACTION_VIEW);
         shortcutIntent.setClassName(getHostPkg(), Constants.SHORTCUT_PROXY_ACTIVITY_NAME);
         shortcutIntent.addCategory(Intent.CATEGORY_DEFAULT);
         if (splash != null) {
@@ -452,13 +463,45 @@ public final class VirtualCore {
         shortcutIntent.putExtra("_VA_|_uri_", targetIntent.toUri(0));
         shortcutIntent.putExtra("_VA_|_user_id_", userId);
 
-        Intent addIntent = new Intent();
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
-        addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon);
-        addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-        context.sendBroadcast(addIntent);
-        return true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+
+            shortcutIntent.removeExtra("_VA_|_intent_");
+
+            ShortcutInfoCompat shortcutInfoCompat = new ShortcutInfoCompat.Builder(context, packageName + ":uId:" + userId)
+                    .setShortLabel(name)
+                    .setLongLabel(name)
+                    .setIcon(IconCompat.createWithBitmap(icon))
+                    .setIntent(shortcutIntent)
+                    .build();
+
+            createShortcutAboveN(context, shortcutInfoCompat.toShortcutInfo());
+
+            return ShortcutManagerCompat.requestPinShortcut(context,
+                    shortcutInfoCompat,
+                    null);
+        } else {
+            Intent addIntent = new Intent();
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+            addIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON, icon);
+            addIntent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+            context.sendBroadcast(addIntent);
+            return true;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.N_MR1)
+    private void createShortcutAboveN(@NonNull Context context,@NonNull  ShortcutInfo likeShortcut) {
+        final ShortcutManager shortcutManager = context.getSystemService(ShortcutManager.class);
+        if (shortcutManager == null) {
+            return;
+        }
+        final List<ShortcutInfo> dynamicShortcuts = shortcutManager.getDynamicShortcuts();
+        final int maxDynamicShortcutCount = shortcutManager.getMaxShortcutCountPerActivity() - shortcutManager.getManifestShortcuts().size();
+        if (dynamicShortcuts.size() >= maxDynamicShortcutCount && !likeShortcut.getId().equals(dynamicShortcuts.get(0).getId())) {
+            shortcutManager.removeDynamicShortcuts(Collections.singletonList(dynamicShortcuts.get(0).getId()));
+        }
+        shortcutManager.addDynamicShortcuts(Collections.singletonList(likeShortcut));
     }
 
     public boolean removeShortcut(int userId, String packageName, Intent splash, OnEmitShortcutListener listener) {
