@@ -18,6 +18,8 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
+
+import android.os.RemoteException;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.View;
@@ -79,6 +81,26 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
     private LaunchpadAdapter mLaunchpadAdapter;
     private Handler mUiHandler;
 
+    private VirtualCore.PackageObserver mPackageObserver = new VirtualCore.PackageObserver() {
+        @Override
+        public void onPackageInstalled(String packageName) throws RemoteException {
+            runOnUiThread(() -> mPresenter.dataChanged());
+        }
+
+        @Override
+        public void onPackageUninstalled(String packageName) throws RemoteException {
+            runOnUiThread(() -> mPresenter.dataChanged());
+        }
+
+        @Override
+        public void onPackageInstalledAsUser(int userId, String packageName) throws RemoteException {
+        }
+
+        @Override
+        public void onPackageUninstalledAsUser(int userId, String packageName) throws RemoteException {
+        }
+    };
+
 
     public static void goHome(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
@@ -97,6 +119,13 @@ public class HomeActivity extends VActivity implements HomeContract.HomeView {
         initLaunchpad();
         initMenu();
         new HomePresenterImpl(this).start();
+        VirtualCore.get().registerObserver(mPackageObserver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        VirtualCore.get().unregisterObserver(mPackageObserver);
     }
 
     private void initMenu() {
