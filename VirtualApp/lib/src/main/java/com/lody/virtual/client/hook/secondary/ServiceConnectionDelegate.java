@@ -38,7 +38,7 @@ public class ServiceConnectionDelegate extends IServiceConnection.Stub {
             throw new IllegalArgumentException("connection is null");
         }
         try {
-            Object activityThread = ActivityThread.currentActivityThread.call();
+            Object activityThread = android.app.ActivityThread.currentActivityThread();
             Object loadApk = ContextImpl.mPackageInfo.get(VirtualCore.get().getContext());
             Handler handler = ActivityThread.getHandler.call(activityThread);
             sd = LoadedApk.getServiceDispatcher.call(loadApk, connection, context, handler, flags);

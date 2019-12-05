@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ConditionVariable;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
 import android.os.RemoteException;
@@ -45,24 +44,20 @@ import com.lody.virtual.client.stub.VASettings;
 import com.lody.virtual.helper.compat.BundleCompat;
 import com.lody.virtual.helper.ipcbus.IPCBus;
 import com.lody.virtual.helper.ipcbus.IPCSingleton;
-import com.lody.virtual.helper.ipcbus.IServerCache;
 import com.lody.virtual.helper.utils.BitmapUtils;
 import com.lody.virtual.os.VUserHandle;
 import com.lody.virtual.remote.InstallResult;
 import com.lody.virtual.remote.InstalledAppInfo;
 import com.lody.virtual.server.interfaces.IAppManager;
-import com.lody.virtual.server.ServiceCache;
 import com.lody.virtual.server.interfaces.IAppRequestListener;
 import com.lody.virtual.server.interfaces.IPackageObserver;
 import com.lody.virtual.server.interfaces.IUiCallback;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import dalvik.system.DexFile;
-import mirror.android.app.ActivityThread;
 
 /**
  * @author Lody
@@ -86,7 +81,7 @@ public final class VirtualCore {
     /**
      * ActivityThread instance
      */
-    private Object mainThread;
+    private android.app.ActivityThread mainThread;
     private Context context;
     /**
      * Main ProcessName
@@ -117,7 +112,7 @@ public final class VirtualCore {
         return get().getPackageManager();
     }
 
-    public static Object mainThread() {
+    public static android.app.ActivityThread mainThread() {
         return get().mainThread;
     }
 
@@ -190,21 +185,11 @@ public final class VirtualCore {
             VASettings.STUB_CP_AUTHORITY = context.getPackageName() + "." + VASettings.STUB_DEF_AUTHORITY;
             ServiceManagerNative.SERVICE_CP_AUTH = context.getPackageName() + "." + ServiceManagerNative.SERVICE_DEF_AUTH;
             this.context = context;
-            mainThread = ActivityThread.currentActivityThread.call();
+            mainThread = android.app.ActivityThread.currentActivityThread();
             unHookPackageManager = context.getPackageManager();
             hostPkgInfo = unHookPackageManager.getPackageInfo(context.getPackageName(), PackageManager.GET_PROVIDERS);
-            IPCBus.initialize(new IServerCache() {
-                @Override
-                public void join(String serverName, IBinder binder) {
-                    ServiceCache.addService(serverName, binder);
-                }
-
-                @Override
-                public IBinder query(String serverName) {
-                    return ServiceManagerNative.getService(serverName);
-                }
-            });
-            detectProcessType();
+            IPCBus.initialize();
+            detectProcessType(context);
             InvocationStubManager invocationStubManager = InvocationStubManager.getInstance();
             invocationStubManager.init();
             invocationStubManager.injectAll();
@@ -256,25 +241,26 @@ public final class VirtualCore {
         }
     }
 
-    private void detectProcessType() {
+    private void detectProcessType(Context context) {
         // Host package name
         hostPkgName = context.getApplicationInfo().packageName;
         // Main process name
         mainProcessName = context.getApplicationInfo().processName;
         // Current process name
-        processName = ActivityThread.getProcessName.call(mainThread);
+        processName = this.mainThread.getProcessName();
         if (processName.equals(mainProcessName)) {
             processType = ProcessType.Main;
         } else if (processName.endsWith(Constants.SERVER_PROCESS_NAME)) {
             processType = ProcessType.Server;
         } else if (VActivityManager.get().isAppProcess(processName)) {
             processType = ProcessType.VAppClient;
+            systemPid = VActivityManager.get().getSystemPid();
         } else {
             processType = ProcessType.CHILD;
         }
-        if (isVAppProcess()) {
-            systemPid = VActivityManager.get().getSystemPid();
-        }
+//        if (isVAppProcess()) {
+//            systemPid = VActivityManager.get().getSystemPid();
+//        }
     }
 
     private IAppManager getService() {

@@ -3,6 +3,9 @@ package com.lody.virtual.helper.ipcbus;
 
 import android.os.IBinder;
 
+import com.lody.virtual.client.ipc.ServiceManagerNative;
+import com.lody.virtual.server.ServiceCache;
+
 import java.lang.reflect.Proxy;
 
 /**
@@ -12,8 +15,18 @@ public class IPCBus {
 
     private static IServerCache sCache;
 
-    public static void initialize(IServerCache cache) {
-        sCache = cache;
+    public static void initialize() {
+        sCache = new IServerCache() {
+            @Override
+            public void join(String serverName, IBinder binder) {
+                ServiceCache.addService(serverName, binder);
+            }
+
+            @Override
+            public IBinder query(String serverName) {
+                return ServiceManagerNative.getService(serverName);
+            }
+        };
     }
 
     private static void checkInitialized() {

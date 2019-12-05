@@ -3,15 +3,23 @@ package android.app;
 public class ActivityThread {
 
     public static ActivityThread currentActivityThread() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public static String currentPackageName() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public static Application currentApplication() {
-        return null;
+        throw new UnsupportedOperationException();
+    }
+
+    public String getProcessName() {
+        throw new UnsupportedOperationException();
+    }
+
+    public ContextImpl getSystemContext() {
+        throw new UnsupportedOperationException();
     }
 
 }

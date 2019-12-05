@@ -52,7 +52,7 @@ public final class PackageManagerStub extends MethodInvocationProxy<MethodInvoca
         ActivityThread.sPackageManager.set(hookedPM);
 
         try {
-            Context systemContext = Reflect.on(ActivityThread.currentActivityThread.call()).call("getSystemContext").get();
+            Context systemContext = android.app.ActivityThread.currentActivityThread().getSystemContext(); //Reflect.on().call("getSystemContext").get();
             Object systemContextPm = Reflect.on(systemContext).field("mPackageManager").get();
             if(systemContextPm != null){
                 Reflect.on(systemContext).field("mPackageManager").set("mPM",hookedPM);

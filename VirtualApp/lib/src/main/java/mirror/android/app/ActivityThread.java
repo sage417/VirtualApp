@@ -35,8 +35,8 @@ import mirror.RefStaticObject;
 
 public class ActivityThread {
     public static Class<?> TYPE = RefClass.load(ActivityThread.class, "android.app.ActivityThread");
-    public static RefStaticMethod currentActivityThread;
-    public static RefMethod<String> getProcessName;
+//    public static RefStaticMethod currentActivityThread;
+//    public static RefMethod<String> getProcessName;
     public static RefMethod<Handler> getHandler;
     public static RefMethod<Object> installProvider;
     public static RefObject<Object> mBoundApplication;
@@ -47,6 +47,7 @@ public class ActivityThread {
     public static RefObject<Map> mProviderMap;
     @MethodSuggestParams({@MethodSuggestParam({IBinder.class, List.class}), @MethodSuggestParam({IBinder.class, List.class, boolean.class})})
     public static RefMethod<Void> performNewIntents;
+    public static RefMethod<Void> handleNewIntent;
     public static RefStaticObject<IInterface> sPackageManager;
     @MethodParams({IBinder.class, String.class, int.class, int.class, Intent.class})
     public static RefMethod<Void> sendActivityResult;
@@ -58,7 +59,7 @@ public class ActivityThread {
         performNewIntentsAdaptor = PerformNewIntentsAdaptor.choose();
     }
 
-    public static void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+    public static void performNewIntents(android.app.ActivityThread thread, IBinder iBinder, Intent intent) {
         performNewIntentsAdaptor.performNewIntents(thread, iBinder, intent);
     }
 
@@ -71,29 +72,46 @@ public class ActivityThread {
 
     private static abstract class PerformNewIntentsAdaptor {
 
-        abstract void performNewIntents(Object thread, IBinder iBinder, Intent intent);
+        abstract void performNewIntents(android.app.ActivityThread thread, IBinder iBinder, Intent intent);
 
         static PerformNewIntentsAdaptor choose() {
-            switch (performNewIntents.paramList().length) {
-                case 3:
-                    return new NMR1PerformNewIntentsAdaptor();
-                case 2:
-                default:
-                    return new DefaultPerformNewIntentsAdaptor();
+
+            if (performNewIntentsAdaptor != null) {
+                return performNewIntentsAdaptor;
             }
+
+            if (handleNewIntent != null) {
+                return new QPerformNewIntentsAdaptor();
+            } else if (performNewIntents != null) {
+                switch (performNewIntents.paramList().length) {
+                    case 3:
+                        return new NMR1PerformNewIntentsAdaptor();
+                    case 2:
+                    default:
+                        return new DefaultPerformNewIntentsAdaptor();
+                }
+            }
+            return null;
         }
 
         static class DefaultPerformNewIntentsAdaptor extends PerformNewIntentsAdaptor {
             @Override
-            void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+            void performNewIntents(android.app.ActivityThread thread, IBinder iBinder, Intent intent) {
                 performNewIntents.call(thread, iBinder, Collections.singletonList(intent));
             }
         }
 
         static class NMR1PerformNewIntentsAdaptor extends PerformNewIntentsAdaptor {
             @Override
-            void performNewIntents(Object thread, IBinder iBinder, Intent intent) {
+            void performNewIntents(android.app.ActivityThread thread, IBinder iBinder, Intent intent) {
                 performNewIntents.call(thread, iBinder, Collections.singletonList(intent), true);
+            }
+        }
+
+        static class QPerformNewIntentsAdaptor extends PerformNewIntentsAdaptor {
+            @Override
+            void performNewIntents(android.app.ActivityThread thread, IBinder iBinder, Intent intent) {
+                handleNewIntent.call(thread, iBinder, Collections.singletonList(intent));
             }
         }
     }
